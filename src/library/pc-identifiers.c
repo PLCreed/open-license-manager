@@ -39,11 +39,11 @@ static FUNCTION_RETURN generate_default_pc_id(PcIdentifier * identifiers,
 
 	if (identifiers == NULL || *num_identifiers == 0) {
 		result_adapterInfos = getAdapterInfos(NULL, &adapter_num);
-		if (result_adapterInfos != FUNC_RET_OK) {
+		if ((result_adapterInfos != FUNC_RET_OK) || (adapter_num == 0)) {
 			return generate_disk_pc_id(identifiers, num_identifiers, false);
 		}
 		result_diskinfos = getDiskInfos(NULL, &disk_num);
-		if (result_diskinfos != FUNC_RET_OK) {
+		if ((result_diskinfos != FUNC_RET_OK) || (disk_num == 0)) {
 			return generate_ethernet_pc_id(identifiers, num_identifiers, true);
 		}
 		*num_identifiers = disk_num * adapter_num;
@@ -283,7 +283,7 @@ FUNCTION_RETURN encode_pc_id(PcIdentifier identifier1, PcIdentifier identifier2,
 	PcIdentifier concat_identifiers[2];
 	char* b64_data = NULL;
 	int b64_size = 0;
-	size_t concatIdentifiersSize = sizeof(PcIdentifier) * 2;
+	const size_t concatIdentifiersSize = sizeof(PcIdentifier) * 2;
 	//concat_identifiers = (PcIdentifier *) malloc(concatIdentifiersSize);
 	memcpy(&concat_identifiers[0], identifier1, sizeof(PcIdentifier));
 	memcpy(&concat_identifiers[1], identifier2, sizeof(PcIdentifier));
@@ -318,6 +318,7 @@ FUNCTION_RETURN generate_user_pc_signature(PcSignature identifier_out,
 	req_buffer_size = req_buffer_size < 2 ? 2 : req_buffer_size;
 	identifiers = (PcIdentifier *) malloc(
 			sizeof(PcIdentifier) * req_buffer_size);
+	memset(identifiers, 0, sizeof(PcIdentifier) * req_buffer_size);
 	result = generate_pc_id(identifiers, &req_buffer_size, strategy);
 	if (result != FUNC_RET_OK) {
 		free(identifiers);
@@ -387,9 +388,12 @@ EVENT_TYPE validate_pc_signature(PcSignature str_code) {
 	//found = false;
 	for (i = 0; i < 2; i++) {
 		current_strategy_id = strategy_from_pc_id(user_identifiers[i]);
-		if (current_strategy_id == STRATEGY_UNKNOWN) {
+		if (current_strategy_id == STRATEGY_UNKNOWN && previous_strategy_id == STRATEGY_UNKNOWN && i==1) {
 			free(calculated_identifiers);
+			printf("Comparing pc identifiers: %d %d %d %s\n",current_strategy_id,previous_strategy_id,i, str_code);
 			return LICENSE_MALFORMED;
+		} else if (current_strategy_id == STRATEGY_UNKNOWN ){
+			continue;
 		}
 		if (current_strategy_id != previous_strategy_id) {
 			if (calculated_identifiers != NULL) {
@@ -399,6 +403,7 @@ EVENT_TYPE validate_pc_signature(PcSignature str_code) {
 			generate_pc_id(NULL, &calc_identifiers_size, current_strategy_id);
 			calculated_identifiers = (PcIdentifier *) malloc(
 					sizeof(PcIdentifier) * calc_identifiers_size);
+			memset(calculated_identifiers, 0, sizeof(PcIdentifier) * calc_identifiers_size);
 			generate_pc_id(calculated_identifiers, &calc_identifiers_size,
 					current_strategy_id);
 		}

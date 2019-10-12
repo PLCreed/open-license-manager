@@ -1,13 +1,20 @@
 # Open License Manager
-![Build Status](https://travis-ci.org/open-license-manager/open-license-manager.png "Build Status")
+[![Build Status](https://travis-ci.org/open-license-manager/open-license-manager.svg?branch=develop)](https://travis-ci.org/open-license-manager/open-license-manager)
+[![experimental](http://badges.github.io/stability-badges/dist/experimental.svg)](http://github.com/badges/stability-badges)[![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
-A license manager written in C/C++ for Windows and Linux environments.
+A copy protection, licensing software written in C/C++ for Windows and Linux.
 
 It allows to protect the software you develop from unauthorized copies,
 limit the usage in time, to a specific set of machines, or prevent the usage in 
 virtualized environments. It is an Open License Manager that helps to keep your 
-software closed ;-)
+software closed :smirk: . A comprehensive [list of features](https://github.com/open-license-manager/open-license-manager/wiki/features), and their status is available in the project wiki.
 
+## License
+The project is donated to the community. It comes with a very large freedom of use for everyone, and it will always be. 
+It uses a [BSD 3 clauses](https://opensource.org/licenses/BSD-3-Clause) licensing schema, that allows free modification and inclusion in commercial software. 
+
+
+## Project Structure
 The software is made by 2 main sub-components:
  * a C library with no (or minimal) external dependencies (the part you have to integrate in your software).
  * a license generator written in C++ (allows you to generate a license).
@@ -20,18 +27,14 @@ these modules are planned....
 You can notice 2 more sub-projects:
  * bootstrap: allows to generate private keys and modify the library on the fly after the downloading.
  * testing  : runs the tests (and publish the results on cdash)
- 
-Licensing
-=====================
-The project comes out with a very large freedom of use for everyone (and it will always be). 
-It uses a BSD 3 clauses licensing schema. 
 
-How to build
-============
+# How to build
+
+Below an overview of the basic build procedure, you can find detailed instructions for each [supported environment](https://github.com/open-license-manager/open-license-manager/wiki/Build-the-library) in the wiki. 
 
 ## prerequisites
-GCC (Linux), MINGW or MSVC (Windows)
-cmake, boost, openssl (Linux/MINGW)
+ * compilsers: GCC (Linux) MINGW (Linux cross compile for Windows), MINGW or MSVC (Windows) 
+ * tools/libs: cmake, boost. If target is linux openssl is necessary.
 
 ```
 git clone https://github.com/open-license-manager/open-license-manager.git
@@ -49,7 +52,7 @@ make install
 
 ## on Windows (with MSVC 2015)
 ```
-cmake .. -G "Visual Studio 14 2015 Win64" -DCMAKE_INSTALL_PREFIX=../install
+cmake .. -G "Visual Studio 14 2015 Win64" -DBOOST_ROOT="{Folder where boost is}" -DCMAKE_INSTALL_PREFIX=../install
 cmake --build . --target install --config Release
 ```
 
@@ -91,3 +94,7 @@ $ ../install/bin/license_generator example -s Jaaa-aaaa-MG9F-ZhBB -o example.lic
 $ ./example
 licence OK
 ```
+
+# How to contribute
+The project is not dead but we take our time to answer. The best interaction you can have with us is through the issue system. Have a look to the [contribution guidelines](blob/develop/CONTRIBUTING.md)
+We use [GitFlow](https://datasift.github.io/gitflow/IntroducingGitFlow.html) (or at least a subset of it). Remember to install the gitflow git plugin and use `develop` as default branch for your pull requests. 
